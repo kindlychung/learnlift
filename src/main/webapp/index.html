@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body data-lift-content-id="main">
+<div id="main" data-lift="surround?with=default;at=content">
+
+
+    <h2 data-lift="Loc.i">welcome.text</h2>
+
+
+    <div data-lift="Courses.list">
+        <ul>
+            <li class="course">
+                <span class="name"></span>
+                <ul>
+                    <li class="student"></li>
+                </ul>
+            </li> </ul>
+    </div>
+
+    <p>
+        <span data-lift="HelloWorld.howdy">
+          Welcome to your Lift app at <span id="time">Time goes here</span>
+        </span>
+    </p>
+
+    <div data-lift="Contacts.list">
+        <ul>
+            <li class="contact">
+                <span class="name"></span>
+                <ul>
+                    <li class="phone"></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <form enctype="multipart/form-data" action="/api/files" method="post">
+            <fieldset>
+                <legend>New File</legend>
+
+                <div>
+                    <label for="uploadFile">File:</label>
+                    <input type="file" id="uploadFile" name="uploadFile"/>
+                </div>
+                <div>
+                    <input type="submit" value="Submit"/>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div>
+        <form id="client-form">
+            <fieldset>
+                <legend>New Client</legend>
+                <div><label for="name">Name:</label><input type="text" id="name"/></div>
+                <div><label for="email">Email:</label><input type="text" id="email"/></div>
+                <div>
+                    <button id="create-client">Submit</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <p><span class="lift:Localization.dynamic"></span></p>
+    <div id="client-data">
+        <h4>Client Data</h4>
+        <ul>
+            <li id="client-id">Id: <span></span></li>
+            <li id="client-name">Client: <span></span></li>
+            <li id="client-email">E-mail: <span></span></li>
+        </ul>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>E-mail</th>
+            <th>View</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody id="clients-tbody">
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        var showDetail = function(element) {
+            $.ajax({
+                url: "/api/clients/" + $(element).data("id"),
+                contentType: "application/json"
+            }).done(function (client) {
+                $("#client-id span").html(client.id);
+                $("#client-name span").html(client.name);
+                $("#client-email span").html(client.email);
+                $("#client-data").show();
+            });
+        };
+
+ var createLine = function(data) {
+           return '<tr>' +
+                    '   <td>' + data.id + '</td>' +
+                    '   <td><input type="text" value="' + data.name + '"/></td>' +
+                    '   <td><input type="text" value="' + data.email + '"/></td>' +
+                    '   <td><a href="#" data-id="' + data.id + '" onclick="showDetail(this)">View</a></td>' +
+                    '   <td><a href="#" data-id="' + data.id + '" onclick="editClient(this)">Edit</a></td>' +
+                    '   <td><a href="#" data-id="' + data.id + '" onclick="deleteClient(this)">Delete</a></td>' +
+                    '</tr>';
+        };
+
+var createClient = function() {
+            var client = {
+                name: $("#name").val(),
+                email: $("#email").val()
+            };
+
+            $.ajax({
+                async: false,
+                type: "post",
+                url: "/api/clients",
+                data: JSON.stringify(client),
+                contentType: "application/json"
+            }).done(function (data) {
+            console.log(data);
+                $("#clients-tbody").append(createLine(data));
+                $("#client-form")[0].reset();
+            });
+        };
+
+          var editClient = function(element) {
+            var name = $(element).parents("tr").find(":input")[0];
+            var email = $(element).parents("tr").find(":input")[1];
+
+            var client = {
+                id: $(element).data("id"),
+                name: name.value,
+                email: email.value
+            };
+
+            $.ajax({
+                async: false,
+                type: "put",
+                url: "/api/clients/" + client.id,
+                data: JSON.stringify(client),
+                contentType: "application/json"
+            }).done(function (data) {
+                alert(JSON.stringify(data));
+            });
+        };
+
+        var deleteClient = function(element) {
+                   $.ajax({
+                       async: false,
+                       type: "delete",
+                       url: "/api/clients/" + $(element).data("id"),
+                       contentType: "application/json"
+                   }).done(function (data) {
+                       $(element).parents("tr").hide();
+}); };
+
+        $(document).ready(function() {
+  $.ajax({
+                url: "/api/clients",
+                contentType: "application/json"
+            }).done(function (data) {
+                var clients = "";
+
+                $.each(data.clients, function(i, client) {
+                    clients += createLine(client);
+                });
+                $("#clients-tbody").html(clients);
+            });
+
+
+            $("#create-client").click(function() {
+                createClient();
+            });
+        });
+
+
+    </script>
+
+    <style type="text/css">
+        #client-data { display: none; }
+        li, h4 {font-weight: bold;}
+        li span {font-weight: normal;}
+    </style>
+
+    <div data-lift="ShoppingCart.show">
+        <table>
+            <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="item"></td>
+                <td class="quantity"></td>
+                <td class="price"></td>
+                <td class="total"></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3">Total</td>
+                <td class="cart-total"></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
+    <!--<div class="lift:SinglePageForm"></div>-->
+
+    <form class="lift:form.ajax">
+        <div class="lift:AjaxForm.form">
+            <div>
+                <label for="from">From:</label>
+                <span id="from">
+            </div>
+            <div>
+                <label for="subject">Subject:</label>
+                <span id="subject">
+            </div>
+            <div>
+                <label for="message">Message:</label>
+                <span id="message"></span>
+            </div>
+            <div>
+                <input type="submit" value="Submit">
+            </div>
+        </div>
+    </form>
+    <div class="lift:MultiPageForm"></div>
+
+    <div data-lift="Calculator.plus">
+        2 + 2 = <span id="result">some number</span>
+    </div>
+
+    <script>
+     var myFunction = function() {
+       $("#cmd2").html("function to show how to send js commands from the server.");
+       }
+
+    </script>
+
+    <h2>Sending a js command from the server</h2>
+    <ul>
+        <li id="cmd1"></li>
+        <li id="cmd2"></li>
+        <li id="cmd3"></li>
+    </ul>
+    <div>
+        <span id="cmd4"></span>
+    </div>
+    <script data-lift="JsCommand.jsCommand"></script>
+
+    <span class="lift:JsCommand.jsFunction1"></span>
+    <div>
+        <select id="person">
+            <option value="Carly">Carly</option>
+            <option value="Joe">Joe</option>
+            <option value="John">John</option>
+            <option value="Mary">Mary</option>
+        </select>
+        <button id="del-ppl">Delete Selected</button>
+    </div>
+
+    <script>
+         $(document).ready(function() {
+           $("#del-ppl").click(function () {
+             ajaxRandomPerson($("#person").val());
+}); });
+
+    </script>
+
+    <table data-lift="Table.dynamic">
+        <thead>
+        <tr>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <div data-lift="Outer.choose">
+        <div class="inner-div"></div>
+    </div>
+
+    <div data-lift="Animals.list">
+        <ul>
+            <li><span class="name"></span> - <span
+                    class="sname"></span></li>
+        </ul>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+</div>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

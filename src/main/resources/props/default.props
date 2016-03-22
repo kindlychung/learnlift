@@ -1,0 +1,8 @@
+mail.user=engelsvictor1@gmail.com
+mail.password=gmail_does_not_allow_this_kind_of_usage_any_more.
+file.folder=/tmp/uploaded
+db.driver=org.postgresql.Driver
+db.url=jdbc:postgresql:liftbook
+db.user=kaiyin
+db.password=1234
+default.jndi.name=jdbc/dsliftbook

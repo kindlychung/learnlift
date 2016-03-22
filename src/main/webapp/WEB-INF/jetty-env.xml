@@ -1,0 +1,15 @@
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+    <New id="dsliftbook" class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg>jdbc/dsliftbook</Arg>
+        <Arg>
+            <New class="org.postgresql.ds.PGSimpleDataSource">
+                <Set name="User">kaiyin</Set>
+                <Set name="Password">gadoor2014</Set>
+                <Set name="DatabaseName">liftbook</Set>
+                <Set name="ServerName">localhost</Set>
+                <Set name="PortNumber">5432</Set>
+            </New>
+        </Arg>
+    </New>
+</Configure>
